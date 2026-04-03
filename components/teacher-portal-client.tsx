@@ -1,87 +1,28 @@
-'use client'
+import { useRouter } from 'next/navigation';
 
-import { useState } from 'react'
-import { Search, Users, Activity, GraduationCap } from 'lucide-react'
+// Other imports...
 
-interface TeacherPortalClientProps {
-  students: any[]
-  wellnessLogs: any[]
-  academicRecords: any[]
-}
+const TeacherPortalClient = () => {
+    const router = useRouter();
 
-export function TeacherPortalClient({ students, wellnessLogs, academicRecords }: TeacherPortalClientProps) {
-  const [searchTerm, setSearchTerm] = useState('')
+    // Other component logic...
 
-  // --- REDIRECTS REMOVED ---
-  // No useEffect here. No useRouter.push here.
-  // This prevents the "backing" loop entirely.
+    const handleRowClick = (id) => {
+        router.push(`/dashboard/students/${id}`);
+    };
 
-  const filteredStudents = students.filter(s =>
-    s.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.student_id?.includes(searchTerm)
-  )
-
-  return (
-    <div className="p-8 bg-slate-50 min-h-screen">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Student Management</h1>
-          <p className="text-slate-500 text-sm">Monitor academic and emotional status of your students.</p>
-        </div>
-        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
-          <Users className="text-[#800000]" size={20} />
-          <span className="font-bold text-slate-700">{students.length} Students</span>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/30">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search students..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#800000]/20 outline-none transition-all"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Name</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Course</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Year</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredStudents.map((student) => (
-                <tr key={student.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-slate-900">{student.full_name}</td>
-                  <td className="px-6 py-4 text-slate-600 text-sm">{student.course}</td>
-                  <td className="px-6 py-4 text-slate-600 text-sm">{student.year_level}</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold uppercase">
-                      Active
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {filteredStudents.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-6 py-10 text-center text-slate-400 italic">
-                    No students found.
-                  </td>
-                </tr>
-              )}
+    return (
+        <table>
+            <tbody>
+                {students.map((student) => (
+                    <tr key={student.id} onClick={() => handleRowClick(student.id)} className="cursor-pointer hover:bg-gray-200">
+                        <td>{student.name}</td>
+                        {/* Additional table data... */}
+                    </tr>
+                ))}
             </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  )
-}
+        </table>
+    );
+};
+
+export default TeacherPortalClient;
