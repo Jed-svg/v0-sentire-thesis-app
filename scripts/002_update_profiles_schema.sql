@@ -93,7 +93,7 @@ CREATE POLICY "admins_select_all_students" ON public.profiles_students
 -- ---- student_survey_responses ----
 CREATE TABLE IF NOT EXISTS public.student_survey_responses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  student_id UUID NOT NULL REFERENCES public.profiles_students(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
   feedback TEXT,
   category TEXT NOT NULL,
@@ -107,18 +107,20 @@ ALTER TABLE public.student_survey_responses ENABLE ROW LEVEL SECURITY;
 -- Students can only INSERT their own responses
 CREATE POLICY "students_insert_own_responses" ON public.student_survey_responses
   FOR INSERT WITH CHECK (
-    student_id IN (
-      SELECT id FROM public.profiles_students
-      WHERE user_id = auth.uid()
-    )
+    user_id = auth.uid()
   );
 
--- Teachers can SELECT responses for students in their department
-CREATE POLICY "teachers_select_student_responses" ON public.student_survey_responses
+-- Students can only SELECT their own responses
+CREATE POLICY "students_select_own_responses" ON public.student_survey_responses
+  FOR SELECT USING (
+    user_id = auth.uid()
+  );
+
+-- Teachers can SELECT responses from all students
+CREATE POLICY "teachers_select_all_responses" ON public.student_survey_responses
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.profiles_teachers pt
-      JOIN public.profiles_students ps ON ps.id = student_id
       WHERE pt.user_id = auth.uid()
     )
   );
@@ -133,7 +135,7 @@ CREATE POLICY "admins_select_all_responses" ON public.student_survey_responses
   );
 
 -- ---- Create indexes for performance ----
-CREATE INDEX IF NOT EXISTS idx_student_survey_responses_student_id ON public.student_survey_responses(student_id);
+CREATE INDEX IF NOT EXISTS idx_student_survey_responses_user_id ON public.student_survey_responses(user_id);
 CREATE INDEX IF NOT EXISTS idx_student_survey_responses_submitted_at ON public.student_survey_responses(submitted_at);
 CREATE INDEX IF NOT EXISTS idx_student_survey_responses_category ON public.student_survey_responses(category);
 CREATE INDEX IF NOT EXISTS idx_profiles_students_user_id ON public.profiles_students(user_id);
