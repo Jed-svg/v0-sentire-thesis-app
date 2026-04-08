@@ -15,11 +15,17 @@ export default async function TeacherOverviewPage() {
 
   if (!user) redirect('/auth/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
-    .maybeSingle()
+  let profile = null
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role, full_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    profile = data
+  } catch (error) {
+    console.error('[v0] Teacher profile fetch error:', error)
+  }
 
   const role = profile?.role ?? user.user_metadata?.role ?? 'student'
 

@@ -19,11 +19,17 @@ export default async function SelectRolePage() {
   }
 
   // Check if user already has a role selected
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle()
+  let profile = null
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+    profile = data
+  } catch (error) {
+    console.error('[v0] Select role profile fetch error:', error)
+  }
 
   // If role is already set, redirect to appropriate dashboard
   if (profile?.role === 'student') {

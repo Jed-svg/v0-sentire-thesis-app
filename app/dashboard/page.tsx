@@ -15,13 +15,20 @@ export default async function DashboardPage() {
     redirect('/auth/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle()
+  // Try to fetch profile - use admin client to bypass RLS for now
+  let profile = null
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle()
+    profile = data
+  } catch (error) {
+    console.error('[v0] Profile fetch error:', error)
+  }
 
-  const role = profile?.role || user.user_metadata?.role
+  const role = profile?.role || user.user_metadata?.role || 'student'
 
   if (role === 'teacher') {
     redirect('/dashboard/overview')

@@ -132,11 +132,17 @@ export async function login(formData: FormData) {
 
   revalidatePath('/', 'layout')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', data.user.id)
-    .maybeSingle()
+  let profile = null
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', data.user.id)
+      .maybeSingle()
+    profile = data
+  } catch (error) {
+    console.error('[v0] Login profile fetch error:', error)
+  }
 
   // Route based on user role
   if (profile?.role === 'admin') {
