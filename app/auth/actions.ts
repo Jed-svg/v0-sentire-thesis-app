@@ -69,6 +69,7 @@ export async function submitWellnessSurvey(data: {
       program: data.program,
       gender: data.answers.gender || null,
       responses: data.answers,
+      survey_category: 'emotional_awareness',
       // Emotional Awareness Section
       q1: data.answers.q1 || null,
       q2: data.answers.q2 || null,
