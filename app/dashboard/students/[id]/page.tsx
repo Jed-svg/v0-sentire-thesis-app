@@ -1,5 +1,4 @@
 import React from 'react';
-import { StudentInsightCard } from './StudentInsightCard';
 
 async function getStudent(id: string): Promise<{ id: string }> {
  const response = await fetch(`/api/students/${id}`);
@@ -16,8 +15,7 @@ const StudentPage = async ({ params }: { params: { id: string } }) => {
  return (
    <div>
      <h1>Student Detail for {student.id}</h1>
-     <StudentInsightCard studentId={student.id} />
-     {/* Implement wellness metrics here */}
+     {/* Implement wellness metrics and student insights here */}
    </div>
  );
 };
