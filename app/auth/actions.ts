@@ -128,15 +128,22 @@ export async function login(formData: FormData) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id')
+    .select('role')
     .eq('id', data.user.id)
     .maybeSingle()
 
-  if (profile) {
-    redirect('/dashboard')
-  } else {
+  // If no profile exists, go to survey (new user)
+  if (!profile) {
     redirect('/survey')
   }
+
+  // If profile exists but no role selected, go to role selection
+  if (!profile.role) {
+    redirect('/auth/select-role')
+  }
+
+  // If profile exists with role, go to dashboard
+  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
